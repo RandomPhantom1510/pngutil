@@ -136,13 +136,9 @@ int main(int argc, char const* argv[]) {
     prnt();
 
     if(IDATIntegrityOK()) { // IDAT Integrity test makes sure that all IDAT chunks are consecutive.
-        printf("%s", GRN);
-        printf("IDAT Integrity test passed.\n");
-        printf("%s\n", CLR);
+        printf("%sIDAT Integrity test passed.%s\n", GRN, CLR);
     } else {
-        printf("%s", RED);
-        printf("IDAT integrity test failed.");
-        printf("%s\n", CLR);
+        printf("%sIDAT integrity test failed.%s\n", RED, CLR);
     }
 
     fclose(infile);
