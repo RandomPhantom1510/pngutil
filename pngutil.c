@@ -7,6 +7,7 @@
     Reverse linked list order
 
 */
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -14,8 +15,8 @@
 #include <stdbool.h>
 
 #define RED     "\033[0;31m" // These will be used to add coloured output to terminals.
-#define GRN     "\033[0;32m"
-#define YLW     "\033[0;33m"
+#define GRN     "\033[0;32m" // This horribleness is being done because I don't want to deal with the external library
+#define YLW     "\033[0;33m" // for coloured terminal output.
 #define CLR      "\033[0m" 
 
 #define BYTE uint8_t
@@ -32,6 +33,7 @@ node* head = NULL; // This is used to make the linked list global
 
 // Function prototypes
 void prnt();
+bool IDATIntegrityOK();
 
 int main(int argc, char const* argv[]) {
 
@@ -56,7 +58,7 @@ int main(int argc, char const* argv[]) {
     // Initialize flags -   Each char represents a diffferent integrity test. chars are flipped to 0 when a test fails
     //                      From left to right - 
     //                      0   -   IDAT Integrity test; 1->7 reserved for future expansion.
-    uint32_t testFlag = 0xFFFFFFFF;
+    // uint32_t testFlag = 0xFFFFFFFF;
     
     // Read infile chunk-by-chunk
     /* 
@@ -133,23 +135,33 @@ int main(int argc, char const* argv[]) {
 
     prnt();
 
+    if(IDATIntegrityOK()) { // IDAT Integrity test makes sure that all IDAT chunks are consecutive.
+        printf("%s", GRN);
+        printf("IDAT Integrity test passed.\n");
+        printf("%s\n", CLR);
+    } else {
+        printf("%s", RED);
+        printf("IDAT integrity test failed.");
+        printf("%s\n", CLR);
+    }
+
     fclose(infile);
 
-    switch(testFlag) {
+    // switch(testFlag) {
 
-        case(0xFFFFFFF0):
-            printf("%s", RED); // This ugliness is because I dont want to deal with the external library for coloured output
-            printf("IDAT integrity test failed.");
-            printf("%s\n", CLR);
-            break;
+    //     case(0xFFFFFFF0):
+    //         printf("%s", RED); // This ugliness is because I dont want to deal with the external library for coloured output
+    //         printf("IDAT integrity test failed.");
+    //         printf("%s\n", CLR);
+    //         break;
 
-        case(0xFFFFFFFF):
-        default:
-            printf("%s", GRN);
-            printf("No issues found.");
-            printf("%s\n", CLR);
-            break;
-    }
+    //     case(0xFFFFFFFF):
+    //     default:
+    //         printf("%s", GRN);
+    //         printf("No issues found.");
+    //         printf("%s\n", CLR);
+    //         break;
+    // }
     return 0;
 }
 
@@ -165,6 +177,24 @@ void prnt() {
     }
 
     return;
+}
+
+bool IDATIntegrityOK() {
+        
+    node *cursor = head;
+    short int flag = -1; // -1 = IDAT chunks not encounterd yet
+                         // 0 = First IDAT chunk encountered
+                         // 1 = First non-IDAT chunk after flag hit zero --> No more IDAT chunks allowed.
+    while(cursor != NULL) {
+        
+        if(cursor->type == 49444154 && flag == -1) {flag = 0;}
+        if(cursor->type == 49444154 && flag == 0) {continue;}
+        if(cursor->type != 49444154 && flag == 0) {flag = 1;}
+        if(cursor->type != 49444154 && flag == 1) {return false;}
+
+        cursor = cursor->next;
+    }
+    return true;    
 }
 
 /*      Error Codes
