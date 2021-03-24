@@ -1,10 +1,17 @@
 // PNG file analyzer
+
+/*
+    TO DO:
+
+    Argparsing using argp.h
+    Reverse linked list order
+
+*/
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <argp.h>
 
 #define RED     "\033[0;31m" // These will be used to add coloured output to terminals.
 #define GRN     "\033[0;32m"
@@ -38,7 +45,7 @@ int main(int argc, char const* argv[]) {
     if (infile == NULL) {return 1;}
 
     
-    // 8-byte array to check PNG signature
+    // Magic array to check magic signature
     BYTE sig[8] = {137,80,78,71,13,10,26,10}; // PNG magic numbers
     BYTE sigcheck[8];
     if (sigcheck == NULL) {fclose(infile);return 3;}
@@ -86,15 +93,13 @@ int main(int argc, char const* argv[]) {
         
         node* newNode = (node*) malloc(sizeof(node));
 
-        // Read LENGTH value; we have to buffer and then append to length hexdigit-by-hexdigit to account for 
-        // reversals of byte-order when reading infile
+        // Read LENGTH value; we have to buffer and then append to length hexdigit-by-hexdigit to account for endian-ness
         for(unsigned j = 0; j < 4; ++j) {
             fread(&buffer, 1, sizeof(BYTE), infile);
-            newNode->length = (newNode->length<<8) | buffer;  // If length is deadbe and buffer is ef this makes sure that length
-                                                        // ends up as deadbeef and not deadef
+            newNode->length = (newNode->length<<8) | buffer;    // If length is deadbe and buffer is ef this makes sure that length
+                                                                // ends up as deadbeef and not deadef
         }
-        // printf("Length: %x\t", newNode->length);
-
+        
         // Read TYPE value
         for(unsigned i = 0; i < 4; ++i) {
             fread(&buffer, 1, sizeof(BYTE), infile);
@@ -116,7 +121,6 @@ int main(int argc, char const* argv[]) {
             fread(&buffer, 1, sizeof(BYTE), infile);
             newNode->crc = (newNode->crc<<8) | buffer;
         }
-        // printf("CRC: %02x%02x%02x%02x\n", (newNode->crc & 0xff000000)>>24, (newNode->crc & 0xff0000)>>16, (newNode->crc & 0xff00)>>8, newNode->crc & 0xff);
 
         newNode->next = head;
         head = newNode;
@@ -125,13 +129,12 @@ int main(int argc, char const* argv[]) {
     }
 
     // Now we have a linked list of chunks, we can add new tests modularly.
-    // Just remember that the linked-list is modular.
+    // Just remember that the linked-list is in reverse; i.e., head points to last chunk, head->next points to second last, (head->next)->next to third last, etc;
 
     prnt();
 
     fclose(infile);
 
-    // Print results
     switch(testFlag) {
 
         case(0xFFFFFFF0):
@@ -156,7 +159,7 @@ void prnt() {
 
     while(cursor != NULL) {
         printf("Length: %x\t", cursor->length);
-        printf("Type: %x\t", cursor->type);
+        printf("Type: %c%c%c%c\t", (cursor->type & 0xff000000)>>24, (cursor->type & 0xff0000)>>16, (cursor->type & 0xff00)>>8, cursor->type & 0xff);
         printf("CRC: %x\n", cursor->crc);
         cursor = cursor->next;
     }
@@ -190,3 +193,6 @@ void prnt() {
                 iTXt    69545874
                 zTXt    7a545874
 */
+
+// This is the correct way to print char equivalents of chunk types
+// "%c%c%c%c\t", (node->type & 0xff000000)>>24, (node->type & 0xff0000)>>16, (node->type & 0xff00)>>8, node->type & 0xff
