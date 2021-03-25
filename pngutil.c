@@ -4,7 +4,6 @@
     TO DO:
 
     Argparsing using argp.h
-    Reverse linked list order
 
 */
 
@@ -86,12 +85,11 @@ int main(int argc, char const* argv[]) {
             |           |       |           |       |           |       |           |   
             | node.NEXT |------>| node.NEXT |------>|    etc;   |------>| node.NEXT |--->NULL   
             |___________|       |___________|       |___________|       |___________|   
-
+               CHUNK 1              CHUNK 2             CHUNK N          IEND CHUNK
     */
 
     BYTE buffer;
-
-    while (true) {
+    while (true) { // This loop reads infile chunk-by-chunk and adds each chunk to a global linked list until IEND chunk is reached.
         
         node* newNode = (node*) malloc(sizeof(node));
 
@@ -124,14 +122,26 @@ int main(int argc, char const* argv[]) {
             newNode->crc = (newNode->crc<<8) | buffer;
         }
 
-        newNode->next = head;
-        head = newNode;
+        newNode->next = NULL;
+     
+        if (head != NULL) {
+
+            node* cursor = head;
+
+            while(cursor != NULL && cursor->next != NULL) {
+                cursor = cursor->next;
+            }
+
+            cursor->next = newNode;
+
+        } else {
+            head = newNode;
+        }
 
         if(newNode->type == 0x49454e44) {break;}
     }
 
     // Now we have a linked list of chunks, we can add new tests modularly.
-    // Just remember that the linked-list is in reverse; i.e., head points to last chunk, head->next points to second last, (head->next)->next to third last, etc;
 
     prnt();
 
