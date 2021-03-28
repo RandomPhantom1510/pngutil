@@ -30,7 +30,7 @@ typedef struct node {
 
 node* head = NULL; // This is used to make the linked list global
 
-// Function prototypes
+// Function prototypesv
 void prnt();
 bool IDATIntegrityOK();
 
@@ -53,13 +53,7 @@ int main(int argc, char const* argv[]) {
     fread(&sigcheck, sizeof(BYTE), 8, infile); // Assign first 8-bytes of infile to sigcheck[]
     // Check infile's magic signature
     if (memcmp(sig, sigcheck, sizeof(sig)) != 0) {printf("Aborted. Not a PNG file or file corrupted.\n");fclose(infile);return 2;}
-
-    // Initialize flags -   Each char represents a diffferent integrity test. chars are flipped to 0 when a test fails
-    //                      From left to right - 
-    //                      0   -   IDAT Integrity test; 1->7 reserved for future expansion.
-    // uint32_t testFlag = 0xFFFFFFFF;
     
-    // Read infile chunk-by-chunk
     /* 
     PNG files begin with a magic no. - followed by a sequence of chunks.
     
@@ -76,16 +70,6 @@ int main(int argc, char const* argv[]) {
         therefore, each chunk has a total no. of 4+4+LENGTH+4 bytes = 12+LENGTH bytes therefore chunksize is always < 12+2^32
 
         Read each chunk and add it to a linked list.
-    
-    We need a linked-list that stores info about each chunk. It should look like this - 
-             ___________         ___________         ___________         ___________      
-            |node.LENGTH|       |node.LENGTH|       |    etc;   |       |node.LENGTH|   
-            | node.TYPE |       | node.TYPE |       |    etc;   |       | node.TYPE |   
-            |*node.DATA |       |*node.DATA |       |    etc;   |       | node.DATA*|   
-            |           |       |           |       |           |       |           |   
-            | node.NEXT |------>| node.NEXT |------>|    etc;   |------>| node.NEXT |--->NULL   
-            |___________|       |___________|       |___________|       |___________|   
-               CHUNK 1              CHUNK 2             CHUNK N          IEND CHUNK
     */
 
     BYTE buffer;
@@ -105,7 +89,6 @@ int main(int argc, char const* argv[]) {
             fread(&buffer, 1, sizeof(BYTE), infile);
             newNode->type = (newNode->type<<8) | buffer;
         }
-        // printf("TYPE: %c%c%c%c\t", (newNode->type & 0xff000000)>>24, (newNode->type & 0xff0000)>>16, (newNode->type & 0xff00)>>8, newNode->type & 0xff);
 
         // Allocate LENGTH bytes of memory for data
         newNode->data = malloc(newNode->length * sizeof(BYTE));
@@ -152,22 +135,6 @@ int main(int argc, char const* argv[]) {
     }
 
     fclose(infile);
-
-    // switch(testFlag) {
-
-    //     case(0xFFFFFFF0):
-    //         printf("%s", RED); // This ugliness is because I dont want to deal with the external library for coloured output
-    //         printf("IDAT integrity test failed.");
-    //         printf("%s\n", CLR);
-    //         break;
-
-    //     case(0xFFFFFFFF):
-    //     default:
-    //         printf("%s", GRN);
-    //         printf("No issues found.");
-    //         printf("%s\n", CLR);
-    //         break;
-    // }
     return 0;
 }
 
@@ -185,7 +152,7 @@ void prnt() {
     return;
 }
 
-bool IDATIntegrityOK() {
+bool IDATIntegrityOK() { // Returns false if IDAT Integrity test fails
         
     node *cursor = head;
     short int flag = -1; // -1 = IDAT chunks not encounterd yet
