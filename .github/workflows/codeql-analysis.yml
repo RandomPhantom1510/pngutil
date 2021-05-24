@@ -55,7 +55,7 @@ jobs:
     #    and modify them (or add more) to build your code if your project
     #    uses a compiled language
 
-    - run: gcc pngutil.c
+    - run: gcc pngutil.c test.c
     
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
