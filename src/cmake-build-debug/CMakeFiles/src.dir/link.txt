@@ -1,0 +1,1 @@
+/usr/bin/cc -g CMakeFiles/src.dir/pngutil.c.o CMakeFiles/src.dir/tests.c.o -o src 

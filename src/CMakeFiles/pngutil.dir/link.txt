@@ -1,0 +1,1 @@
+/usr/bin/cc CMakeFiles/pngutil.dir/pngutil.c.o CMakeFiles/pngutil.dir/tests.c.o -o pngutil 

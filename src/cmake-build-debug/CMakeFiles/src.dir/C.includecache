@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/user/pngutil/src/defs.h
+stdint.h
+-
+
+/home/user/pngutil/src/pngutil.c
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+defs.h
+/home/user/pngutil/src/defs.h
+tests.h
+/home/user/pngutil/src/tests.h
+
+/home/user/pngutil/src/tests.c
+defs.h
+/home/user/pngutil/src/defs.h
+tests.h
+/home/user/pngutil/src/tests.h
+
+/home/user/pngutil/src/tests.h
+defs.h
+/home/user/pngutil/src/defs.h
+stdbool.h
+-
+stddef.h
+-
+
