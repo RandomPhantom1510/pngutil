@@ -132,14 +132,14 @@ void prnt(NODE* head) {
 
     while(cursor != NULL) {
         printf("Length: %x\t", cursor->length);
-        printf("Type: %c%c%c%c\t",
+        printf("Type: %c%c%c%c\t\n",
 				 (cursor->type & 0xff000000)>>24,
 				 (cursor->type & 0xff0000)>>16,
 				 (cursor->type & 0xff00)>>8,
 				  cursor->type & 0xff
 				// See note at bottom of file
 	      );
-        printf("CRC: %08x\n", cursor->crc);
+        //printf("CRC: %08x\n", cursor->crc);
         cursor = cursor->next;
     }
 
