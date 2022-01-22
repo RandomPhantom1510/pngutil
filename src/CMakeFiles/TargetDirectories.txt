@@ -1,3 +1,0 @@
-/home/user/pngutil/src/CMakeFiles/rebuild_cache.dir
-/home/user/pngutil/src/CMakeFiles/edit_cache.dir
-/home/user/pngutil/src/CMakeFiles/pngutil.dir
