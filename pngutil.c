@@ -31,16 +31,9 @@ int main(int argc, char const* argv[])
     BYTE sigcheck[8];
     fread(&sigcheck, sizeof(BYTE), 8, infile);
 
-    char ic;
     if (memcmp(sig, sigcheck, sizeof(sig)) != 0) {
-        printf("Not a PNG file or file unreadable."
-                                "Continue anyway? [y/n]\n");
-        scanf("%c", &ic);
-        if (ic == 'y' || ic == 'Y'){}
-	else {
-		fclose(infile);
-        	return 2;
-	}
+        printf("Not a PNG file or file unreadable.\n");
+        return 2;
     }
 
     // LENGTH (4-byte unsigned int) = no. of bytes in DATA.
