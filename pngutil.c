@@ -109,17 +109,17 @@ int main(int argc, char const* argv[]) {
     prnt(head);
 
     // IDAT Integrity test makes sure that all IDAT chunks are in order
-    if(IDATIntegrityOK(head)) {
-        printf("%sIDAT Integrity test passed.%s\n", GRN, CLR);
+    if (IDATIntegrityOK(head)) {
+        printf("IDAT Integrity test passed.\n");
     } else {
-        printf("%sIDAT integrity test failed.%s\n", RED, CLR);
+        printf("IDAT integrity test failed.\n");
     }
 
     // CRC check makes sure that CRC integrity is in order.
     if (CRCCheckOK(head)) {
-        printf("%sCRC check passed.%s\n", GRN, CLR);
+        printf("CRC check passed.\n");
     } else {
-        printf("%sCRC check failed.%s\n", RED, CLR);
+        printf("CRC check failed.\n");
     }
 
     fclose(infile);
