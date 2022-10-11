@@ -14,21 +14,20 @@
 
 void prnt(NODE* head);
 
-int main(int argc, char const* argv[]) {
+int main(int argc, char const* argv[])
+{
 
-    printf("pngutil by Z. Rahman\n--------------------\n");
-
-    if(argc != 2) {
+    if (argc != 2) {
         printf("Usage: %s <FILE>\n", argv[0]);
         return 4;
     }
 
     FILE* infile = fopen(argv[1], "r");
-    if (infile == NULL) {return 1;}
-
+    if (infile == NULL) { return 1; }
 
     // PNG magic numbers must match first 8 bytes of file.
-    BYTE sig[8] = {137,80,78,71,13,10,26,10};
+    BYTE sig[8] = { 137, 80, 78, 71, 13, 10, 26, 10 };
+
     BYTE sigcheck[8];
     fread(&sigcheck, sizeof(BYTE), 8, infile);
 
@@ -59,35 +58,35 @@ int main(int argc, char const* argv[]) {
 
     while (true) {
 
-        NODE* newNode = (NODE*) malloc(sizeof(NODE));
+        NODE* newNode = (NODE*)malloc(sizeof(NODE));
 
-	    // If length is 'deadbe' and buffer is 'ef' this makes sure
-	    // that length ends up as deadbeef and not deadef
-        for(unsigned j = 0; j < 4; ++j) {
+        // If length is 'deadbe' and buffer is 'ef' this makes sure
+        // that length ends up as deadbeef and not deadef
+        for (unsigned j = 0; j < 4; ++j) {
             fread(&buffer, 1, sizeof(BYTE), infile);
-            newNode->length = (newNode->length<<8) | buffer;
+            newNode->length = (newNode->length << 8) | buffer;
         }
 
         // Read TYPE value
-        for(unsigned i = 0; i < 4; ++i) {
+        for (unsigned i = 0; i < 4; ++i) {
             fread(&buffer, 1, sizeof(BYTE), infile);
-            newNode->type = (newNode->type<<8) | buffer;
+            newNode->type = (newNode->type << 8) | buffer;
         }
 
         // Allocate LENGTH bytes of memory for data
         newNode->data = malloc(newNode->length * sizeof(BYTE));
-        if (newNode->data == NULL) {fclose(infile);}
+        if (newNode->data == NULL) { fclose(infile); }
 
         // Populate DATA
-        for(unsigned j = 0; j < newNode->length; ++j) {
+        for (unsigned j = 0; j < newNode->length; ++j) {
             fread(&buffer, 1, sizeof(BYTE), infile);
-            *(newNode->data) = (*(newNode->data)<<8) | buffer;
+            *(newNode->data) = (*(newNode->data) << 8) | buffer;
         }
 
         // Read CRC value
-        for(unsigned i = 0; i < 4; ++i) {
+        for (unsigned i = 0; i < 4; ++i) {
             fread(&buffer, 1, sizeof(BYTE), infile);
-            newNode->crc = (newNode->crc<<8) | buffer;
+            newNode->crc = (newNode->crc << 8) | buffer;
         }
 
         newNode->next = NULL;
@@ -95,14 +94,16 @@ int main(int argc, char const* argv[]) {
         if (head != NULL) {
             NODE* cursor = head;
 
-            while(cursor != NULL && cursor->next != NULL) {
+            while (cursor != NULL && cursor->next != NULL) {
                 cursor = cursor->next;
             }
             cursor->next = newNode;
 
-        } else {head = newNode;}
+        } else {
+            head = newNode;
+        }
 
-        if(newNode->type == IEND_CHUNK) {break;}
+        if (newNode->type == IEND_CHUNK) { break; }
     }
 
     prnt(head);
@@ -125,20 +126,19 @@ int main(int argc, char const* argv[]) {
     return 0;
 }
 
-void prnt(NODE* head) {
+void prnt(NODE* head)
+{
 
     NODE* cursor = head;
 
-    while(cursor != NULL) {
+    while (cursor != NULL) {
         printf("Length: %x\t", cursor->length);
-        printf("Type: %c%c%c%c\t\n",
-				 (cursor->type & 0xff000000)>>24,
-				 (cursor->type & 0xff0000)>>16,
-				 (cursor->type & 0xff00)>>8,
-				  cursor->type & 0xff
-				// See note at bottom of file
-	      );
-        //printf("CRC: %08x\n", cursor->crc);
+        printf("Type: %c%c%c%c\t\n", (cursor->type & 0xff000000) >> 24,
+               (cursor->type & 0xff0000) >> 16, (cursor->type & 0xff00) >> 8,
+               cursor->type & 0xff
+               // See note at bottom of file
+        );
+        // printf("CRC: %08x\n", cursor->crc);
         cursor = cursor->next;
     }
 
@@ -152,7 +152,6 @@ void prnt(NODE* head) {
     3 - Runtime memory error
     4 - Incorrect usage
 */
-
 
 /*      Hex equivalents of common chunk types
 
