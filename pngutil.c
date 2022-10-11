@@ -30,7 +30,6 @@ int main(int argc, char const* argv[]) {
     // PNG magic numbers must match first 8 bytes of file.
     BYTE sig[8] = {137,80,78,71,13,10,26,10};
     BYTE sigcheck[8];
-    if (sigcheck == NULL) {fclose(infile); return 3;}
     fread(&sigcheck, sizeof(BYTE), 8, infile);
 
     char ic;
